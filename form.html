@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Details</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <style>
+    body {
+      font-family: 'Ubuntu Mono', monospace;
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .terminal {
+      background-color: #2d2d2d;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      padding: 2rem;
+      width: 100%;
+      max-width: 700px;
+    }
+    input, textarea {
+      background-color: #1e1e1e;
+      border: 1px solid white;
+      color: white;
+      padding: 0.5rem;
+      width: 100%;
+      border-radius: 4px;
+    }
+    label {
+      font-weight: bold;
+      color: white;
+    }
+    button {
+      background-color: #575757;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      margin-top: 1rem;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #747474;
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <h1 class="text-xl font-bold mb-4 text-white-400">Enter Your Portfolio Details</h1>
+    <form id="portfolioForm" class="space-y-4">
+      <!-- Hidden field to store selected template -->
+      <input type="hidden" name="template" id="selectedTemplate">
+      
+      <div>
+        <label>First Name</label>
+        <input type="text" name="firstName" required>
+      </div>
+      <div>
+        <label>Last Name</label>
+        <input type="text" name="lastName" required>
+      </div>
+      <div>
+        <label>Description</label>
+        <textarea name="bio" rows="2" required></textarea>
+      </div>
+      <div>
+        <label>Frontend Skills (comma separated)</label>
+        <input type="text" name="frontend">
+      </div>
+      <div>
+        <label>Backend Skills</label>
+        <input type="text" name="backend">
+      </div>
+      <div>
+        <label>Database Skills</label>
+        <input type="text" name="databases">
+      </div>
+      <div>
+        <label>Projects (JSON Array)</label>
+        <textarea name="projects" placeholder='[{"name": "MyApp", "desc": "An app", "live": "#", "code": "#"}]' rows="3" required></textarea>
+      </div>
+      <div>
+        <label>Email</label>
+        <input type="email" name="email" required>
+      </div>
+      <button type="submit" class="text-white">Generate Portfolio ZIP</button>
+    </form>
+  </div>
+
+  <script>
+    // Set the selected template from localStorage
+    document.getElementById('selectedTemplate').value = localStorage.getItem('selectedTemplate');
+    
+    // Form submission (same as before)
+    document.getElementById('portfolioForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const projects = JSON.parse(data.projects);
+        const templateFile = `${data.template}-template.html`;
+        const templateText = await fetch(templateFile).then(res => res.text());
+
+        let renderedHtml = templateText
+          .replace(/{{firstName}}/g, data.firstName)
+          .replace(/{{lastName}}/g, data.lastName)
+          .replace(/{{bio}}/g, data.bio)
+          .replace(/{{frontend}}/g, data.frontend)
+          .replace(/{{backend}}/g, data.backend)
+          .replace(/{{databases}}/g, data.databases)
+          .replace(/{{email}}/g, data.email);
+
+        const projectRegex = /{{#each projects}}([\s\S]*?){{\/each}}/;
+        const match = renderedHtml.match(projectRegex);
+        if (match) {
+          const projectTemplate = match[1];
+          const renderedProjects = projects.map(p => {
+            return projectTemplate
+              .replace(/{{name}}/g, p.name)
+              .replace(/{{desc}}/g, p.desc)
+              .replace(/{{live}}/g, p.live)
+              .replace(/{{code}}/g, p.code);
+          }).join('\n');
+          renderedHtml = renderedHtml.replace(projectRegex, renderedProjects);
+        }
+
+        const zip = new JSZip();
+        zip.file("index.html", renderedHtml);
+        const blob = await zip.generateAsync({ type: "blob" });
+        saveAs(blob, `${data.firstName.toLowerCase()}-portfolio.zip`);
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

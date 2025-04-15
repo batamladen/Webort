@@ -1,0 +1,241 @@
+<!-- template.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{firstName}} {{lastName}} | Terminal Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap');
+    body {
+      font-family: 'Ubuntu Mono', monospace;
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      overflow-x: hidden;
+    }
+    .terminal { background-color: #2d2d2d; border-radius: 8px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); overflow: hidden; }
+    .terminal-header { background-color: #3c3c3c; padding: 8px 15px; display: flex; align-items: center; }
+    .terminal-button { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+    .terminal-content { padding: 20px; height: 70vh; overflow-y: auto; }
+    .command-line { display: flex; margin-bottom: 15px; align-items: center; }
+    .prompt { color: #4CAF50; margin-right: 10px; white-space: nowrap; }
+    .cursor {
+      display: inline-block; width: 10px; height: 20px; background-color: #f0f0f0;
+      animation: blink 1s infinite; position: absolute; left: 0;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .command-output { margin-bottom: 20px; line-height: 1.6; }
+    .hidden { display: none; }
+    .link { color: #4CAF50; text-decoration: underline; cursor: pointer; }
+    .project-card { background-color: #3c3c3c; border-left: 3px solid #4CAF50; padding: 15px; margin-bottom: 15px; transition: transform 0.2s; }
+    .project-card:hover { transform: translateX(5px); }
+    .typewriter {
+      overflow: hidden; border-right: 2px solid #4CAF50; white-space: nowrap;
+      animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    }
+    @keyframes typing { from { width: 0 } to { width: 100% } }
+    @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: #4CAF50; } }
+    .input-container { position: relative; flex-grow: 1; }
+    #commandInput {
+      position: absolute; left: 0; width: 100%; background: transparent; border: none;
+      outline: none; color: transparent; caret-color: transparent;
+    }
+    .input-display { position: relative; display: inline-block; white-space: pre; }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="terminal w-full max-w-4xl">
+    <div class="terminal-header">
+      <div class="terminal-button bg-red-500"></div>
+      <div class="terminal-button bg-yellow-500"></div>
+      <div class="terminal-button bg-green-500"></div>
+      <div class="ml-3 text-sm">bash — 80×24</div>
+    </div>
+    <div class="terminal-content" id="terminalContent">
+      <!-- Initial welcome -->
+      <div class="command-output">
+        <div class="typewriter text-xl font-bold mb-2">Welcome to my terminal portfolio!</div>
+        <p>Type <span class="text-green-400">'help'</span> to see available commands.</p>
+      </div>
+
+      <!-- Active command input line -->
+      <div class="command-line">
+        <span class="prompt">visitor@portfolio:~$</span>
+        <div class="input-container">
+          <input type="text" id="commandInput" class="bg-transparent border-none outline-none flex-grow text-white" autofocus>
+          <div class="input-display" id="inputDisplay"></div>
+          <div class="cursor" id="inputCursor"></div>
+        </div>
+      </div>
+
+      <!-- COMMAND OUTPUTS -->
+
+      <div id="helpOutput" class="command-output">
+        <p>Available commands:</p>
+        <ul class="list-disc pl-5 mt-2">
+          <li><span class="text-green-400">help</span> - Display this help message</li>
+          <li><span class="text-green-400">about</span> - Learn about me</li>
+          <li><span class="text-green-400">projects</span> - View my projects</li>
+          <li><span class="text-green-400">skills</span> - See my technical skills</li>
+          <li><span class="text-green-400">contact</span> - Get in touch with me</li>
+          <li><span class="text-green-400">clear</span> - Clear the terminal</li>
+        </ul>
+      </div>
+
+      <div id="aboutOutput" class="command-output hidden">
+        <h2 class="text-xl font-bold mb-2">About Me</h2>
+        <p>Hello! I'm <span class="text-green-400">{{firstName}} {{lastName}}</span>.</p>
+        <p class="mt-2">{{bio}}</p>
+      </div>
+
+      <div id="projectsOutput" class="command-output hidden">
+        <h2 class="text-xl font-bold mb-4">My Projects</h2>
+        {{#each projects}}
+        <div class="project-card">
+          <h3 class="text-lg font-bold text-green-400">{{name}}</h3>
+          <p class="text-sm text-gray-400">{{desc}}</p>
+          <p class="mt-2"><span class="link" onclick="window.open('{{live}}')">view live</span> | <span class="link" onclick="window.open('{{code}}')">view code</span></p>
+        </div>
+        {{/each}}
+      </div>
+
+      <div id="skillsOutput" class="command-output hidden">
+        <h2 class="text-xl font-bold mb-4">Technical Skills</h2>
+        <ul class="list-disc pl-6">
+          <li><strong>Frontend:</strong> {{frontend}}</li>
+          <li><strong>Backend:</strong> {{backend}}</li>
+          <li><strong>Databases:</strong> {{databases}}</li>
+        </ul>
+      </div>
+
+      <div id="contactOutput" class="command-output hidden">
+        <h2 class="text-xl font-bold mb-4">Contact</h2>
+        <p>You can reach me at: <a class="text-green-400 underline" href="mailto:{{email}}">{{email}}</a></p>
+      </div>
+
+      <div id="invalidCommandOutput" class="command-output hidden">
+        <p>Command not found. Type <span class="text-green-400">'help'</span> to see available commands.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // You can keep the full command logic like in your original file here (executeCommand, input handler, etc.)
+  </script>
+</body>
+
+<script>
+    // Terminal command logic
+    const terminalContent = document.getElementById('terminalContent');
+    const commandInput = document.getElementById('commandInput');
+    const inputDisplay = document.getElementById('inputDisplay');
+    const inputCursor = document.getElementById('inputCursor');
+    
+    const commandOutputs = {
+      'help': document.getElementById('helpOutput'),
+      'about': document.getElementById('aboutOutput'),
+      'projects': document.getElementById('projectsOutput'),
+      'skills': document.getElementById('skillsOutput'),
+      'contact': document.getElementById('contactOutput'),
+      'invalid': document.getElementById('invalidCommandOutput')
+    };
+    
+    let commandHistory = [];
+    let historyIndex = -1;
+    
+    commandInput.focus();
+    
+    function updateInputDisplay() {
+      const text = commandInput.value;
+      inputDisplay.textContent = text;
+    
+      const span = document.createElement('span');
+      span.textContent = text.substring(0, commandInput.selectionStart);
+      span.style.visibility = 'hidden';
+      span.style.position = 'absolute';
+      document.body.appendChild(span);
+      const width = span.getBoundingClientRect().width;
+      document.body.removeChild(span);
+    
+      inputCursor.style.left = `${width}px`;
+    }
+    
+    commandInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        executeCommand(commandInput.value.trim().toLowerCase());
+        commandInput.value = '';
+        updateInputDisplay();
+      } else if (e.key === 'ArrowUp') {
+        if (historyIndex < commandHistory.length - 1) {
+          historyIndex++;
+          commandInput.value = commandHistory[commandHistory.length - 1 - historyIndex];
+          updateInputDisplay();
+        }
+        e.preventDefault();
+      } else if (e.key === 'ArrowDown') {
+        if (historyIndex > 0) {
+          historyIndex--;
+          commandInput.value = commandHistory[commandHistory.length - 1 - historyIndex];
+          updateInputDisplay();
+        } else if (historyIndex === 0) {
+          historyIndex = -1;
+          commandInput.value = '';
+          updateInputDisplay();
+        }
+        e.preventDefault();
+      }
+    });
+    
+    commandInput.addEventListener('input', updateInputDisplay);
+    commandInput.addEventListener('click', updateInputDisplay);
+    commandInput.addEventListener('keyup', updateInputDisplay);
+    
+    updateInputDisplay();
+    
+    function executeCommand(command) {
+      if (!command) return;
+    
+      commandHistory.push(command);
+      historyIndex = -1;
+    
+      const commandLine = document.createElement('div');
+      commandLine.className = 'command-line';
+      commandLine.innerHTML = `
+        <span class="prompt">visitor@portfolio:~$</span>
+        <span>${command}</span>
+      `;
+      terminalContent.insertBefore(commandLine, commandInput.parentNode.parentNode);
+    
+      Object.values(commandOutputs).forEach(output => {
+        output.classList.add('hidden');
+      });
+    
+      if (command === 'clear') {
+        clearTerminal();
+      } else if (commandOutputs[command]) {
+        commandOutputs[command].classList.remove('hidden');
+      } else {
+        commandOutputs['invalid'].classList.remove('hidden');
+      }
+    
+      terminalContent.scrollTop = terminalContent.scrollHeight;
+    }
+    
+    function clearTerminal() {
+      const elementsToRemove = Array.from(terminalContent.querySelectorAll('.command-line, .command-output'));
+      elementsToRemove.forEach((el, index) => {
+        if (index !== 0 && !el.contains(commandInput)) {
+          terminalContent.removeChild(el);
+        }
+      });
+    }
+    
+    setTimeout(() => {
+      const tw = document.querySelector('.typewriter');
+      if (tw) tw.style.borderRight = 'none';
+    }, 3500);
+    </script>
+    
+
+</html>
