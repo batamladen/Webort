@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Terminal Template Preview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      font-family: 'Ubuntu Mono', monospace;
+      padding: 2rem;
+    }
+    .btn {
+      background-color: #4CAF50;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      color: white;
+      margin: 0.5rem;
+      display: inline-block;
+    }
+    .btn:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body class="max-w-3xl mx-auto">
+  <h1 class="text-2xl font-bold text-green-400 mb-4">Terminal Portfolio Template</h1>
+  <p class="mb-4">A fun, interactive terminal-style personal website built entirely in HTML/CSS/JS. Type commands to explore the portfolio!</p>
+
+  <img src="demo.webp" alt="Template Screenshot" class="rounded mb-4 shadow-lg" />
+
+  <!-- Optional video demo -->
+  <video controls class="w-full rounded shadow-lg mb-6">
+    <source src="demo.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div>
+    <a href="form.html" onclick="localStorage.setItem('selectedTemplate', 'terminal')" class="btn">Use This Template</a>
+    <a href="index.html" class="btn bg-gray-600 hover:bg-gray-700">Back to Templates</a>
+  </div>
+</body>
+</html>
