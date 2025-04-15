@@ -4,5 +4,6 @@ A website portfolio generator made with the information you put in. Choose a tem
 # Templates:
 
 * Terminal Template
+
 ![terminal](https://github.com/user-attachments/assets/a0f8a26c-02d0-41e4-acc7-25a0cc2d566b)
 
